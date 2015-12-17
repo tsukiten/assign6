@@ -31,9 +31,10 @@ class Fighter{
 		}
 	}
 
-	void shoot() {
-		
+	  void shoot(int i) {
+            bullets[i] = new Bullet();
 	}
+
 
 	void move(int direct) {
 		switch (direct) {
