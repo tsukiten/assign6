@@ -1,8 +1,8 @@
 class GameState
 {
-	static final int START = 0;
+   static final int START = 0;
 	static final int PLAYING = 1;
-	static final int END = 2;
+	static final int END =  2;
 }
 class Direction
 {
@@ -24,11 +24,13 @@ class FlightType
 	static final int ENEMY = 1;
 	static final int ENEMYSTRONG = 2;
 }
-
+int n=0;
 int state = GameState.START;
 int currentType = EnemysShowingType.STRAIGHT;
 int enemyCount = 8;
+int bulletCount = 5;
 Enemy[] enemys = new Enemy[enemyCount];
+Bullet[] bullets = new Bullet[bulletCount];
 Fighter fighter;
 Background bg;
 FlameMgr flameMgr;
@@ -42,6 +44,7 @@ boolean isMovingRight;
 
 int time;
 int wait = 4000;
+int value=40;
 
 
 
@@ -75,17 +78,36 @@ void draw()
 			if (enemys[i]!= null) {
 				enemys[i].move();
 				enemys[i].draw();
-				if (enemys[i].isCollideWithFighter()) {
-					fighter.hpValueChange(-20);
-					flameMgr.addFlame(enemys[i].x, enemys[i].y);
-					enemys[i]=null;
+                       if (enemys[i].isCollideWithFighter()) {
+                            flameMgr.addFlame(enemys[i].x, enemys[i].y);
+                            fighter.hpValueChange(-enemys[i].damage);
+                            enemys[i]=null; 
 				}
 				else if (enemys[i].isOutOfBorder()) {
 					enemys[i]=null;
 				}
 			}
 		}
-		// 這地方應該加入Fighter 血量顯示UI
+          for (int i=0; i<5; i++) {
+            if (bullets[i]!= null) {
+            bullets[i].move();
+            bullets[i].display();
+              if (bullets[i].x<-30) {
+               bullets[i]=null;
+        }}
+         for (int j=0; j<8; j++) {
+          if (enemys[j]!=null && enemys[j].isCollideWithBullet(i)) {
+            enemys[j].life--;
+            bullets[i]=null;
+            if (enemys[j].life == 0) {
+              flameMgr.addFlame(enemys[j].x, enemys[j].y);
+              enemys[j]=null;
+            }
+          }  
+         }
+    }
+		// 這地方應該加入Fighter 血量顯示UI  
+          hpDisplay.updateWithFighterHP(fighter.hp);
 		
 	}
 	else if (state == GameState.END) {
@@ -120,7 +142,12 @@ void keyReleased(){
   }
   if (key == ' ') {
   	if (state == GameState.PLAYING) {
-		fighter.shoot();
+         if(bullets[0]!=null&&bullets[1]!=null&&bullets[2]!=null&&bullets[3]!=null&&bullets[4]!=null){
+        }else{
+          fighter.shoot(n);
+          n++;
+          n=n%5;
+        }
 	}
   }
   if (key == ENTER) {
@@ -132,8 +159,9 @@ void keyReleased(){
 		flameMgr = new FlameMgr();
 		treasure = new Treasure();
 		fighter = new Fighter(20);
+       for(int i=0;i<5;i++){
+          bullets[i]=null;}
       default : break ;
     }
   }
 }
-
